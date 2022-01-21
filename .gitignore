@@ -10,6 +10,23 @@
 /[Ll]ogs/
 /[Mm]emoryCaptures/
 
+# Excluding Firebase SDK
+/[Aa]ssets/Firebase/
+/[Aa]ssets/Plugins/
+/[Aa]ssets/Firebase.meta
+/[Aa]ssets/Plugins.meta
+
+# Excluding API Key
+
+/[Aa]ssets/GoogleService-Info.plist
+/[Aa]ssets/GoogleService-Info.plist.meta
+/[Aa]ssets/[Gg]oogle-services.json
+/[Aa]ssets/[Gg]oogle-services.json
+
+
+# Excluding MacOS files
+.DS_Store
+
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
 
