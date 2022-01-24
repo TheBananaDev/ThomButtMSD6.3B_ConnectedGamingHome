@@ -1,8 +1,8 @@
-using Firebase.Extensions;
-using Firebase.Storage;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Firebase.Storage;
+using Firebase.Extensions;
 using UnityEngine.Networking;
 
 public class DLCDownloader : MonoBehaviour
@@ -31,7 +31,6 @@ public class DLCDownloader : MonoBehaviour
         switch (bckId)
         {
             case 1:
-                //Downloads the square image
                 bkg1Ref.GetBytesAsync(maxAllowedSize).ContinueWithOnMainThread(task1 => {
                     if (task1.IsFaulted || task1.IsCanceled)
                     {
@@ -45,7 +44,7 @@ public class DLCDownloader : MonoBehaviour
                         Debug.Log("Finished downloading!");
 
                         //Converts the byte stream to a Texture2D component and displays it
-                        Texture2D texture= new Texture2D(1920, 1080);
+                        Texture2D texture = new Texture2D(1920, 1080);
                         texture.LoadImage(fileContents);
                         Sprite sprite = Sprite.Create(texture, new Rect(0f, 0f, 1920f, 1080f), new Vector2(0, 0), 100f);
                         ui.background1.sprite = sprite;
@@ -54,7 +53,6 @@ public class DLCDownloader : MonoBehaviour
                 });
                 break;
             case 2:
-                //Downloads the circle imge
                 bkg2Ref.GetBytesAsync(maxAllowedSize).ContinueWithOnMainThread(task2 => {
                     if (task2.IsFaulted || task2.IsCanceled)
                     {
@@ -77,7 +75,6 @@ public class DLCDownloader : MonoBehaviour
                 });
                 break;
             case 3:
-                //Downloads the circle imge
                 bkg3Ref.GetBytesAsync(maxAllowedSize).ContinueWithOnMainThread(task3 => {
                     if (task3.IsFaulted || task3.IsCanceled)
                     {

@@ -54,16 +54,24 @@ public class UIManager : MonoBehaviour
     public int currPanel;
     public string winner;
 
+    private DataHandler dh;
+
     // Start is called before the first frame update
     void Start()
     {
         SwitchMenu(0);
+        dh = FindObjectOfType<DataHandler>();
     }
 
     // Update is called once per frame
     void Update()
     {
         UpdateActiveElements();
+    }
+
+    public void JoinGame()
+    {
+        dh.JoinGame(lobbyKey.text);
     }
 
     private void UpdateActiveElements()
@@ -245,7 +253,7 @@ public class UIManager : MonoBehaviour
             {
                 switch (type)
                 {
-                    case 0:
+                    case 1:
                         player1ChoiceImage.sprite = rockSprite;
                         tempColor = player1ChoiceImage.color;
                         tempColor.r = 1;
@@ -254,7 +262,7 @@ public class UIManager : MonoBehaviour
                         tempColor.a = 1;
                         player1ChoiceImage.color = tempColor;
                         break;
-                    case 1:
+                    case 2:
                         player1ChoiceImage.sprite = paperSprite;
                         tempColor = player1ChoiceImage.color;
                         tempColor.r = 1;
@@ -263,7 +271,7 @@ public class UIManager : MonoBehaviour
                         tempColor.a = 1;
                         player1ChoiceImage.color = tempColor;
                         break;
-                    case 2:
+                    case 3:
                         player1ChoiceImage.sprite = scissorSprite;
                         tempColor = player1ChoiceImage.color;
                         tempColor.r = 1;
@@ -280,7 +288,7 @@ public class UIManager : MonoBehaviour
             {
                 switch (type)
                 {
-                    case 0:
+                    case 1:
                         player2ChoiceImage.sprite = rockSprite;
                         tempColor = player2ChoiceImage.color;
                         tempColor.r = 1;
@@ -289,7 +297,7 @@ public class UIManager : MonoBehaviour
                         tempColor.a = 1;
                         player2ChoiceImage.color = tempColor;
                         break;
-                    case 1:
+                    case 2:
                         player2ChoiceImage.sprite = paperSprite;
                         tempColor = player2ChoiceImage.color;
                         tempColor.r = 1;
@@ -298,7 +306,7 @@ public class UIManager : MonoBehaviour
                         tempColor.a = 1;
                         player2ChoiceImage.color = tempColor;
                         break;
-                    case 2:
+                    case 3:
                         player2ChoiceImage.sprite = scissorSprite;
                         tempColor = player2ChoiceImage.color;
                         tempColor.r = 1;

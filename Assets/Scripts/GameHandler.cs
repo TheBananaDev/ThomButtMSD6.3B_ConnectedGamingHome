@@ -5,33 +5,39 @@ using UnityEngine;
 public class GameHandler : MonoBehaviour
 {
     public UIManager ui;
+    public DataHandler dh;
     public bool bothConnected;
+    public bool playerType;
+    public int gameState;
 
-    private int gameState;
-    private int player1Score;
+    private int localPlayerScore;
     private int player2Score;
+
     private int currRound;
-    private int player1Choice;
-    private int player2Choice;
+    private int localPlayerChoice;
+    public int player2Choice;
     private float timer;
+    private float totalTimer;
+    private float totalmoves;
 
     // Start is called before the first frame update
     void Start()
     {
         ui = FindObjectOfType<UIManager>();
+        dh = FindObjectOfType<DataHandler>();
         gameState = 0;
-        //bothConnected = false;
+        bothConnected = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(gameState);
         ui.timerText.text = "Time Left: "+Mathf.Round(timer);
         //Ongoing round
         if (timer > 0)
         {
             timer -= Time.deltaTime;
+            totalTimer += Time.deltaTime;
         }
         //End of round - start grace period
         if (timer <= 0 && gameState == 1)
@@ -57,22 +63,26 @@ public class GameHandler : MonoBehaviour
     private void StartNewGame()
     {
         gameState = 1;
-        player1Choice = 0;
+        localPlayerChoice = 0;
         player2Choice = 0;
-        player1Score = 0;
+        localPlayerScore = 0;
         player2Score = 0;
         currRound = 0;
         timer = 10f;
         ui.UpdateGameSelection(false, 0, false);
         ui.UpdateGameSelection(true, 0, false);
         ui.statusText.text = "Pick your move!";
+        totalmoves = 0;
+        totalTimer = 0;
     }
 
     private void StartNewRound()
     {
+        dh.UpdateChoice(0, false);
+        dh.UpdateChoice(0, true);
         ui.UpdateButtons(true);
         gameState = 1;
-        player1Choice = 0;
+        localPlayerChoice = 0;
         player2Choice = 0;
         currRound = currRound + 1;
         timer = 10f;
@@ -83,6 +93,7 @@ public class GameHandler : MonoBehaviour
 
     private void StartGracePeriod()
     {
+        ui.UpdateGameSelection(true, player2Choice, true);
         ui.UpdateButtons(false);
         gameState = 2;
         timer = 5f;
@@ -92,11 +103,19 @@ public class GameHandler : MonoBehaviour
     public void StartLobby()
     {
         gameState = -1;
+        dh.NewLobby();
     }
 
     public void Forfeit()
     {
-        player2Score = player2Score + 2;
+        if(playerType == false)
+        {
+            player2Score = player2Score + 2;
+        }
+        else
+        {
+            localPlayerScore = localPlayerScore + 2;
+        }
         currRound = 5;
         CalculateRoundWinner();
     }
@@ -112,19 +131,20 @@ public class GameHandler : MonoBehaviour
         else
         {
             AddScore();
+            timer = 0;
             gameState = 0;
             //Both players win
-            if (player1Score == player2Score)
+            if (localPlayerScore == player2Score)
             {
                 ui.winner = "Both";
             }
             //Player 1 wins
-            else if (player1Score > player2Score)
+            else if (localPlayerScore > player2Score)
             {
                 ui.winner = "Player 1";
             }
             //Player 2 wins
-            else if (player1Score < player2Score)
+            else if (localPlayerScore < player2Score)
             {
                 ui.winner = "Player 2";
             }
@@ -135,13 +155,13 @@ public class GameHandler : MonoBehaviour
     private void AddScore()
     {
         //No input
-        if (player1Choice == 0 || player2Choice == 0)
+        if (localPlayerChoice == 0 || player2Choice == 0)
         {
-            if (player1Choice == 0 && player2Choice == 0)
+            if (localPlayerChoice == 0 && player2Choice == 0)
             {
                 ui.statusText.text = "Draw!";
             }
-            else if (player1Choice == 0)
+            else if (localPlayerChoice == 0)
             {
                 ui.statusText.text = "You lose!";
                 player2Score = player2Score + 1;
@@ -149,11 +169,11 @@ public class GameHandler : MonoBehaviour
             else if (player2Choice == 0)
             {
                 ui.statusText.text = "You win!";
-                player1Score = player1Score + 1;
+                localPlayerScore = localPlayerScore + 1;
             }
         }
 
-        switch (player1Choice)
+        switch (localPlayerChoice)
         {
             //Rock
             case 1:
@@ -162,7 +182,7 @@ public class GameHandler : MonoBehaviour
                     //Rock - Tie
                     case 1:
                         ui.statusText.text = "Draw!";
-                        player1Score = player1Score + 1;
+                        localPlayerScore = localPlayerScore + 1;
                         player2Score = player2Score + 1;
                         break;
                     //Paper - Player 2
@@ -173,7 +193,7 @@ public class GameHandler : MonoBehaviour
                     //Scissors - Player 1
                     case 3:
                         ui.statusText.text = "You win!";
-                        player1Score = player1Score + 1;
+                        localPlayerScore = localPlayerScore + 1;
                         break;
                     //Invalid
                     default:
@@ -187,12 +207,12 @@ public class GameHandler : MonoBehaviour
                     //Rock - Player 1
                     case 1:
                         ui.statusText.text = "You win!";
-                        player1Score = player1Score + 1;
+                        localPlayerScore = localPlayerScore + 1;
                         break;
                     //Paper - Tie
                     case 2:
                         ui.statusText.text = "Draw!";
-                        player1Score = player1Score + 1;
+                        localPlayerScore = localPlayerScore + 1;
                         player2Score = player2Score + 1;
                         break;
                     //Scissors - Player 2
@@ -217,12 +237,12 @@ public class GameHandler : MonoBehaviour
                     //Paper - Player 1
                     case 2:
                         ui.statusText.text = "You win!";
-                        player1Score = player1Score + 1;
+                        localPlayerScore = localPlayerScore + 1;
                         break;
                     //Scissors - Tie
                     case 3:
                         ui.statusText.text = "Draw!";
-                        player1Score = player1Score + 1;
+                        localPlayerScore = localPlayerScore + 1;
                         player2Score = player2Score + 1;
                         break;
                     //Invalid
@@ -238,21 +258,32 @@ public class GameHandler : MonoBehaviour
 
     public void GetPlayerChoice(int choice)
     {
-        player1Choice = choice;
+        localPlayerChoice = choice;
+        if (playerType == false)
+        {
+            
+            dh.UpdateChoice(localPlayerChoice, false);
+        }
+        else
+        {
+            dh.UpdateChoice(localPlayerChoice, true);
+        }
+        
         ui.UpdateGameSelection(false, choice, true);
         switch (choice)
         {
-            case 0:
+            case 1:
                 ui.statusText.text = "Rock";
                 break;
-            case 1:
+            case 2:
                 ui.statusText.text = "Paper";
                 break;
-            case 2:
+            case 3:
                 ui.statusText.text = "Scissors";
                 break;
             default:
                 break;
         }
+        totalmoves = totalmoves + 1;
     }
 }
