@@ -120,6 +120,28 @@ public class GameHandler : MonoBehaviour
         CalculateRoundWinner();
     }
 
+    public void EmergencyQuit()
+    {
+        timer = 0;
+        gameState = 0;
+        //Both players win
+        if (localPlayerScore == player2Score)
+        {
+            ui.winner = "Both";
+        }
+        //Player 1 wins
+        else if (localPlayerScore > player2Score)
+        {
+            ui.winner = "Player 1";
+        }
+        //Player 2 wins
+        else if (localPlayerScore < player2Score)
+        {
+            ui.winner = "Player 2";
+        }
+        ui.SwitchMenu(2);
+    }
+
     private void CalculateRoundWinner()
     {
         //Round finished - go to next round

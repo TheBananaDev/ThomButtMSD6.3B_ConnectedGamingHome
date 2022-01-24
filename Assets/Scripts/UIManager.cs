@@ -55,12 +55,14 @@ public class UIManager : MonoBehaviour
     public string winner;
 
     private DataHandler dh;
+    private GameHandler gh;
 
     // Start is called before the first frame update
     void Start()
     {
         SwitchMenu(0);
         dh = FindObjectOfType<DataHandler>();
+        gh = FindObjectOfType<GameHandler>();
     }
 
     // Update is called once per frame

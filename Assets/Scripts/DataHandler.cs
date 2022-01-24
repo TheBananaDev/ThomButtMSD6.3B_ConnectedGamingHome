@@ -37,6 +37,7 @@ public class DataHandler : MonoBehaviour
         databaseRef.Child("Sessions").Child(lobbyKey).SetRawJsonValueAsync(JsonUtility.ToJson(user));
         databaseRef.Child("Sessions").Child(lobbyKey).Child("player2Connected").ValueChanged += ConnectionChanged;
         databaseRef.Child("Sessions").Child(lobbyKey).Child("player2Choice").ValueChanged += GetOtherPlayerChoice;
+        databaseRef.Child("Sessions").Child(lobbyKey).ValueChanged += MonitorObject;
     }
 
     public void JoinGame(string roomCode)
@@ -62,6 +63,7 @@ public class DataHandler : MonoBehaviour
                           databaseRef.Child("Sessions").Child(lobbyKey).Child("player2Connected").SetValueAsync(true);
                           databaseRef.Child("Sessions").Child(lobbyKey).Child("player1Connected").ValueChanged += ConnectionChanged;
                           databaseRef.Child("Sessions").Child(lobbyKey).Child("player1Choice").ValueChanged += GetOtherPlayerChoice;
+                          databaseRef.Child("Sessions").Child(lobbyKey).ValueChanged += MonitorObject;
                           gh.bothConnected = true;
                       }
                   }
@@ -134,6 +136,21 @@ public class DataHandler : MonoBehaviour
         databaseRef.Child("Sessions").Child(lobbyKey).RemoveValueAsync();
     }
 
+    void MonitorObject(object sender, ValueChangedEventArgs args)
+    {
+        if (args.DatabaseError != null)
+        {
+            Debug.LogError(args.DatabaseError.Message);
+            return;
+        }
+
+        sessionData sesh = JsonUtility.FromJson<sessionData>(args.Snapshot.GetRawJsonValue());
+        if (sesh == null)
+        {
+            gh.EmergencyQuit();
+        }
+    }
+
     void ConnectionChanged(object sender, ValueChangedEventArgs args)
     {
         if (args.DatabaseError != null)
@@ -146,8 +163,7 @@ public class DataHandler : MonoBehaviour
         {
             FirebaseDatabase.DefaultInstance
               .GetReference("Sessions/" + lobbyKey + "/player2Connected")
-              .GetValueAsync().ContinueWithOnMainThread(task =>
-              {
+              .GetValueAsync().ContinueWithOnMainThread(task => {
                   if (task.IsFaulted)
                   {
                       Debug.Log("Error when getting values from database");
@@ -155,10 +171,15 @@ public class DataHandler : MonoBehaviour
                   else if (task.IsCompleted)
                   {
                       DataSnapshot snapshot = task.Result;
+                      Debug.Log("Choice is " + snapshot.Value);
 
                       if ((bool)snapshot.Value == true)
                       {
                           gh.bothConnected = true;
+                      }
+                      if (gh.bothConnected == true && (bool)snapshot.Value == false)
+                      {
+                          gh.EmergencyQuit();
                       }
                   }
               });
@@ -167,8 +188,7 @@ public class DataHandler : MonoBehaviour
         {
             FirebaseDatabase.DefaultInstance
               .GetReference("Sessions/" + lobbyKey + "/player1Connected")
-              .GetValueAsync().ContinueWithOnMainThread(task =>
-              {
+              .GetValueAsync().ContinueWithOnMainThread(task => {
                   if (task.IsFaulted)
                   {
                       Debug.Log("Error when getting values from database");
@@ -176,10 +196,15 @@ public class DataHandler : MonoBehaviour
                   else if (task.IsCompleted)
                   {
                       DataSnapshot snapshot = task.Result;
+                      Debug.Log("Choice is " + snapshot.Value);
 
                       if ((bool)snapshot.Value == true)
                       {
                           gh.bothConnected = true;
+                      }
+                      if (gh.bothConnected == true && (bool)snapshot.Value == false)
+                      {
+                          gh.EmergencyQuit();
                       }
                   }
               });
