@@ -35,6 +35,9 @@ public class UIManager : MonoBehaviour
     public Button paperBut;
     public Button scissorsBut;
 
+    [Header("Waiting Lobby")]
+    public TMP_InputField roomcode;
+
     [Header("End Game Menu")]
     public TextMeshProUGUI winnerText;
 
@@ -103,6 +106,10 @@ public class UIManager : MonoBehaviour
             //End Screen
             case 2:
                 winnerText.text = "The Winner is " + winner;
+                break;
+            //Waiting Screen
+            case 4:
+                roomcode.text = dh.lobbyKey;
                 break;
             default:
                 Debug.Log("Invalid menu id given - not updating elements");

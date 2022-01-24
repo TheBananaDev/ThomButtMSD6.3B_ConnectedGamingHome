@@ -4,6 +4,7 @@ using Firebase.Storage;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class DataHandler : MonoBehaviour
@@ -24,11 +25,13 @@ public class DataHandler : MonoBehaviour
         ui = FindObjectOfType<UIManager>();
     }
 
+    //Deletes lobby upon cloising
     private void OnApplicationQuit()
     {
         DeleteLobby();
     }
 
+    //Opens new lobby
     public void NewLobby()
     {
         gh.playerType = false;
@@ -40,6 +43,7 @@ public class DataHandler : MonoBehaviour
         databaseRef.Child("Sessions").Child(lobbyKey).ValueChanged += MonitorObject;
     }
 
+    //Joins existing game
     public void JoinGame(string roomCode)
     {
         FirebaseDatabase.DefaultInstance
@@ -70,18 +74,22 @@ public class DataHandler : MonoBehaviour
               });
     }
 
-    public void UpdateChoice(int choice, bool player)
+    //Uploads details
+    public void UpdatePlayerDets(int choice, int moves, bool player)
     {
         if (player == false)
         {
             databaseRef.Child("Sessions").Child(lobbyKey).Child("player1Choice").SetValueAsync(choice);
+            databaseRef.Child("Sessions").Child(lobbyKey).Child("player1Moves").SetValueAsync(moves);
         }
         else
         {
             databaseRef.Child("Sessions").Child(lobbyKey).Child("player2Choice").SetValueAsync(choice);
+            databaseRef.Child("Sessions").Child(lobbyKey).Child("player2Moves").SetValueAsync(moves);
         }
     }
 
+    //Gets other player choice
     public void GetOtherPlayerChoice(object sender, ValueChangedEventArgs args)
     {
         if (args.DatabaseError != null)
@@ -136,6 +144,7 @@ public class DataHandler : MonoBehaviour
         databaseRef.Child("Sessions").Child(lobbyKey).RemoveValueAsync();
     }
 
+    //Event listener for whole object
     void MonitorObject(object sender, ValueChangedEventArgs args)
     {
         if (args.DatabaseError != null)
@@ -151,6 +160,7 @@ public class DataHandler : MonoBehaviour
         }
     }
 
+    //Event listener for change in connections
     void ConnectionChanged(object sender, ValueChangedEventArgs args)
     {
         if (args.DatabaseError != null)
@@ -210,11 +220,81 @@ public class DataHandler : MonoBehaviour
               });
         }
     }
+
+    //Saves data to Firebase Storage
+    public void SaveMatch()
+    {
+        if (lobbyKey == null || lobbyKey == "")
+        {
+            return;
+        }
+
+        matchData data = new matchData();
+        data.key = lobbyKey;
+        data.player1Moves = gh.totalmoves;
+        if(gh.playerType == false)
+        {
+            FirebaseDatabase.DefaultInstance
+              .GetReference("Sessions/" + lobbyKey + "/player2Moves")
+              .GetValueAsync().ContinueWithOnMainThread(task => {
+                  if (task.IsFaulted)
+                  {
+                      Debug.Log("Error when getting values from database");
+                  }
+                  else if (task.IsCompleted)
+                  {
+                      DataSnapshot snapshot = task.Result;
+                      Debug.Log("Choice is " + snapshot.Value);
+
+                      data.player2Moves = (int)snapshot.Value;
+                  }
+              });
+        }
+        else
+        {
+            FirebaseDatabase.DefaultInstance
+              .GetReference("Sessions/" + lobbyKey + "/player1Moves")
+              .GetValueAsync().ContinueWithOnMainThread(task => {
+                  if (task.IsFaulted)
+                  {
+                      Debug.Log("Error when getting values from database");
+                  }
+                  else if (task.IsCompleted)
+                  {
+                      DataSnapshot snapshot = task.Result;
+                      Debug.Log("Choice is " + snapshot.Value);
+
+                      data.player2Moves = (int)snapshot.Value;
+                  }
+              });
+        }
+        data.winner = ui.winner;
+        data.timeTaken = gh.totalTimer;
+
+        byte[] customBytes = System.Text.Encoding.UTF8.GetBytes(JsonUtility.ToJson(data));
+        StorageReference saveRef = storageRef.RootReference.Child("SaveData/"+lobbyKey+".txt");
+
+        saveRef.PutBytesAsync(customBytes)
+            .ContinueWith((Task<StorageMetadata> task) => {
+                if (task.IsFaulted || task.IsCanceled)
+                {
+                    Debug.Log(task.Exception.ToString());
+                }
+                else
+                {
+                    StorageMetadata metadata = task.Result;
+                    string md5Hash = metadata.Md5Hash;
+                    Debug.Log("Finished uploading...");
+                    Debug.Log("md5 hash = " + md5Hash);
+                }
+            });
+    }
 }
 
 [Serializable]
 public class matchData
 {
+    public string key = "";
     public int player1Moves = 0;
     public int player2Moves = 0;
     public string winner = "";
@@ -228,4 +308,6 @@ public class sessionData
     public bool player2Connected = false;
     public int player1Choice = 0;
     public int player2Choice = 0;
+    public int player1Moves = 0;
+    public int player2Moves = 0;
 }

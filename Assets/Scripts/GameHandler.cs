@@ -22,8 +22,8 @@ public class GameHandler : MonoBehaviour
     private int localPlayerChoice;
     public int player2Choice;
     private float timer;
-    private float totalTimer;
-    private float totalmoves;
+    public float totalTimer;
+    public int totalmoves;
 
     // Start is called before the first frame update
     void Start()
@@ -66,6 +66,7 @@ public class GameHandler : MonoBehaviour
         }
     }
 
+    //Starts new game
     private void StartNewGame()
     {
         gameState = 1;
@@ -81,6 +82,7 @@ public class GameHandler : MonoBehaviour
         totalmoves = 0;
         totalTimer = 0;
 
+        //Background image
         if(dl.bkg1Purchased == true)
         {
             int randMax = 1;
@@ -168,10 +170,11 @@ public class GameHandler : MonoBehaviour
         }
     }
 
+    //Goes to next round
     private void StartNewRound()
     {
-        dh.UpdateChoice(0, false);
-        dh.UpdateChoice(0, true);
+        dh.UpdatePlayerDets(0, 0, false);
+        dh.UpdatePlayerDets(0, 0, true);
         ui.UpdateButtons(true);
         gameState = 1;
         localPlayerChoice = 0;
@@ -183,6 +186,7 @@ public class GameHandler : MonoBehaviour
         ui.statusText.text = "Pick your move!";
     }
 
+    //Totals score with a 5s break
     private void StartGracePeriod()
     {
         ui.UpdateGameSelection(true, player2Choice, true);
@@ -192,12 +196,14 @@ public class GameHandler : MonoBehaviour
         CalculateRoundWinner();
     }
 
+    //Starts new lobby
     public void StartLobby()
     {
         gameState = -1;
         dh.NewLobby();
     }
 
+    //Forfeits game
     public void Forfeit()
     {
         if(playerType == false)
@@ -212,6 +218,7 @@ public class GameHandler : MonoBehaviour
         CalculateRoundWinner();
     }
 
+    //Quits (for when game is closed)
     public void EmergencyQuit()
     {
         timer = 0;
@@ -232,8 +239,10 @@ public class GameHandler : MonoBehaviour
             ui.winner = "Player 2";
         }
         ui.SwitchMenu(2);
+        dh.SaveMatch();
     }
 
+    //Calculates round winner
     private void CalculateRoundWinner()
     {
         //Round finished - go to next round
@@ -263,9 +272,11 @@ public class GameHandler : MonoBehaviour
                 ui.winner = "Player 2";
             }
             ui.SwitchMenu(2);
+            dh.SaveMatch();
         }
     }
 
+    //Adds score
     private void AddScore()
     {
         //No input
@@ -369,18 +380,19 @@ public class GameHandler : MonoBehaviour
                 break;
         }
     }
-
+    
+    //Gets player 2 choice
     public void GetPlayerChoice(int choice)
     {
         localPlayerChoice = choice;
+        totalmoves = totalmoves + 1;
         if (playerType == false)
         {
-            
-            dh.UpdateChoice(localPlayerChoice, false);
+            dh.UpdatePlayerDets(localPlayerChoice, totalmoves, false);
         }
         else
         {
-            dh.UpdateChoice(localPlayerChoice, true);
+            dh.UpdatePlayerDets(localPlayerChoice, totalmoves, true);
         }
         
         ui.UpdateGameSelection(false, choice, true);
@@ -398,6 +410,5 @@ public class GameHandler : MonoBehaviour
             default:
                 break;
         }
-        totalmoves = totalmoves + 1;
     }
 }
