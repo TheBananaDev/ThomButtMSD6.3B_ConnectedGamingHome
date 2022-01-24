@@ -164,4 +164,89 @@ public class UIManager : MonoBehaviour
                 break;
         }
     }
+
+    public void UpdateDLC(int bkgID, bool enable)
+    {
+        switch (bkgID)
+        {
+            //Game Menu
+            case 1:
+                if(enable == true)
+                {
+                    background1Text.text = "";
+                    statusText1.text = "Purchased";
+                    Color tempColor = background1.color;
+                    tempColor.r = 1;
+                    tempColor.g = 1;
+                    tempColor.b = 1;
+                    tempColor.a = 1;
+                    background1.color = tempColor;
+                }
+                else
+                {
+                    background1Text.text = "?";
+                    statusText1.text = "Not Owned Yet";
+                    Color tempColor = background1.color;
+                    tempColor.r = 63;
+                    tempColor.g = 63;
+                    tempColor.b = 63;
+                    tempColor.a = 255;
+                    background1.color = tempColor;
+                }
+                break;
+            //End Game Menu
+            case 2:
+                if (enable == true)
+                {
+                    background2Text.text = "";
+                    statusText2.text = "Purchased";
+                    Color tempColor = background2.color;
+                    tempColor.r = 1;
+                    tempColor.g = 1;
+                    tempColor.b = 1;
+                    tempColor.a = 1;
+                    background2.color = tempColor;
+                }
+                else
+                {
+                    background2Text.text = "?";
+                    statusText2.text = "Not Owned Yet";
+                    Color tempColor = background2.color;
+                    tempColor.r = 63;
+                    tempColor.g = 63;
+                    tempColor.b = 63;
+                    tempColor.a = 255;
+                    background2.color = tempColor;
+                }
+                break;
+            //DLC Store
+            case 3:
+                if (enable == true)
+                {
+                    background3Text.text = "";
+                    statusText3.text = "Purchased";
+                    Color tempColor = background3.color;
+                    tempColor.r = 1;
+                    tempColor.g = 1;
+                    tempColor.b = 1;
+                    tempColor.a = 1;
+                    background3.color = tempColor;
+                }
+                else
+                {
+                    background3Text.text = "?";
+                    statusText3.text = "Not Owned Yet";
+                    Color tempColor = background3.color;
+                    tempColor.r = 63;
+                    tempColor.g = 63;
+                    tempColor.b = 63;
+                    tempColor.a = 255;
+                    background3.color = tempColor;
+                }
+                break;
+            default:
+                Debug.Log("Invalid background id given - not updating elements");
+                break;
+        }
+    }
 }
