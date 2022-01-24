@@ -6,6 +6,11 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
+    [Header("Base Sprites")]
+    public Sprite rockSprite;
+    public Sprite paperSprite;
+    public Sprite scissorSprite;
+
     [Header("Panels")]
     public GameObject gameLobbyMenu;
     public GameObject endgameMenu;
@@ -25,7 +30,6 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI statusText;
     public Image player1ChoiceImage;
     public Image player2ChoiceImage;
-    public Button commitBut;
     public Button surrBut;
     public Button rockBut;
     public Button paperBut;
@@ -47,8 +51,8 @@ public class UIManager : MonoBehaviour
     public Image background3;
     public Scrollbar progressBar;
 
-    private int currPanel;
-    private bool committed;
+    public int currPanel;
+    public string winner;
 
     // Start is called before the first frame update
     void Start()
@@ -86,27 +90,9 @@ public class UIManager : MonoBehaviour
                     joinLobbyBut.interactable = true;
                 }
                 break;
-            //Game Menu
-            case 1:
-                if (committed == true)
-                {
-                    commitBut.interactable = false;
-                    surrBut.interactable = false;
-                    rockBut.interactable = false;
-                    paperBut.interactable = false;
-                    scissorsBut.interactable = false;
-                }
-                else
-                {
-                    commitBut.interactable = true;
-                    surrBut.interactable = true;
-                    rockBut.interactable = true;
-                    paperBut.interactable = true;
-                    scissorsBut.interactable = true;
-                }
-                break;
-            //DLC Store
-            case 3:
+            //End Screen
+            case 2:
+                winnerText.text = "The Winner is " + winner;
                 break;
             default:
                 Debug.Log("Invalid menu id given - not updating elements");
@@ -130,16 +116,16 @@ public class UIManager : MonoBehaviour
             //Game Menu
             case 1:
                 gameLobbyMenu.SetActive(false);
-                endgameMenu.SetActive(true);
-                gameMenu.SetActive(false);
+                endgameMenu.SetActive(false);
+                gameMenu.SetActive(true);
                 dlcStoreMenu.SetActive(false);
                 waitingMenu.SetActive(false);
                 break;
             //End Game Menu
             case 2:
                 gameLobbyMenu.SetActive(false);
-                endgameMenu.SetActive(false);
-                gameMenu.SetActive(true);
+                endgameMenu.SetActive(true);
+                gameMenu.SetActive(false);
                 dlcStoreMenu.SetActive(false);
                 waitingMenu.SetActive(false);
                 break;
@@ -171,7 +157,7 @@ public class UIManager : MonoBehaviour
         {
             //Game Menu
             case 1:
-                if(enable == true)
+                if (enable == true)
                 {
                     background1Text.text = "";
                     statusText1.text = "Purchased";
@@ -247,6 +233,126 @@ public class UIManager : MonoBehaviour
             default:
                 Debug.Log("Invalid background id given - not updating elements");
                 break;
+        }
+    }
+
+    public void UpdateGameSelection(bool player, int type, bool enable)
+    {
+        Color tempColor = new Color();
+        if (enable == true)
+        {
+            if (player == false)
+            {
+                switch (type)
+                {
+                    case 0:
+                        player1ChoiceImage.sprite = rockSprite;
+                        tempColor = player1ChoiceImage.color;
+                        tempColor.r = 1;
+                        tempColor.g = 1;
+                        tempColor.b = 1;
+                        tempColor.a = 1;
+                        player1ChoiceImage.color = tempColor;
+                        break;
+                    case 1:
+                        player1ChoiceImage.sprite = paperSprite;
+                        tempColor = player1ChoiceImage.color;
+                        tempColor.r = 1;
+                        tempColor.g = 1;
+                        tempColor.b = 1;
+                        tempColor.a = 1;
+                        player1ChoiceImage.color = tempColor;
+                        break;
+                    case 2:
+                        player1ChoiceImage.sprite = scissorSprite;
+                        tempColor = player1ChoiceImage.color;
+                        tempColor.r = 1;
+                        tempColor.g = 1;
+                        tempColor.b = 1;
+                        tempColor.a = 1;
+                        player1ChoiceImage.color = tempColor;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                switch (type)
+                {
+                    case 0:
+                        player2ChoiceImage.sprite = rockSprite;
+                        tempColor = player2ChoiceImage.color;
+                        tempColor.r = 1;
+                        tempColor.g = 1;
+                        tempColor.b = 1;
+                        tempColor.a = 1;
+                        player2ChoiceImage.color = tempColor;
+                        break;
+                    case 1:
+                        player2ChoiceImage.sprite = paperSprite;
+                        tempColor = player2ChoiceImage.color;
+                        tempColor.r = 1;
+                        tempColor.g = 1;
+                        tempColor.b = 1;
+                        tempColor.a = 1;
+                        player2ChoiceImage.color = tempColor;
+                        break;
+                    case 2:
+                        player2ChoiceImage.sprite = scissorSprite;
+                        tempColor = player2ChoiceImage.color;
+                        tempColor.r = 1;
+                        tempColor.g = 1;
+                        tempColor.b = 1;
+                        tempColor.a = 1;
+                        player2ChoiceImage.color = tempColor;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        else
+        {
+            if (player == false)
+            {
+                player1ChoiceImage.sprite = null;
+                tempColor = player1ChoiceImage.color;
+                tempColor.r = 137;
+                tempColor.g = 164;
+                tempColor.b = 32;
+                tempColor.a = 0;
+                player1ChoiceImage.color = tempColor;
+            }
+            else
+            {
+                player2ChoiceImage.sprite = null;
+                tempColor = player2ChoiceImage.color;
+                tempColor.r = 137;
+                tempColor.g = 164;
+                tempColor.b = 32;
+                tempColor.a = 0;
+                player2ChoiceImage.color = tempColor;
+            }
+        }
+    }
+
+    //Game Menu
+    public void UpdateButtons(bool enable)
+    {
+        if (enable == true)
+        {
+            surrBut.interactable = true;
+            rockBut.interactable = true;
+            paperBut.interactable = true;
+            scissorsBut.interactable = true;
+        }
+        else
+        {
+            surrBut.interactable = false;
+            rockBut.interactable = false;
+            paperBut.interactable = false;
+            scissorsBut.interactable = false;
         }
     }
 }
