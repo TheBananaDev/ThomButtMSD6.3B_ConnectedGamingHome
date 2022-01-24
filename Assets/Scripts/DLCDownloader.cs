@@ -13,10 +13,17 @@ public class DLCDownloader : MonoBehaviour
     private const string url2 = "gs://connectedgamingassignment.appspot.com/Background/background2.jpg";
     private const string url3 = "gs://connectedgamingassignment.appspot.com/Background/background3.png";
 
+    public bool bkg1Purchased;
+    public bool bkg2Purchased;
+    public bool bkg3Purchased;
+
     // Start is called before the first frame update
     void Start()
     {
         ui = FindObjectOfType<UIManager>();
+        bkg1Purchased = false;
+        bkg2Purchased = false;
+        bkg3Purchased = false;
     }
 
     public void DownloadImage(int bckId)
@@ -118,6 +125,7 @@ public class DLCDownloader : MonoBehaviour
                 else
                 {
                     ui.UpdateDLC(bkgID, true);
+                    bkg1Purchased = true;
                 }
                 break;
             case 2:
@@ -131,6 +139,7 @@ public class DLCDownloader : MonoBehaviour
                 else
                 {
                     ui.UpdateDLC(bkgID, true);
+                    bkg2Purchased = true;
                 }
                 break;
             case 3:
@@ -144,6 +153,7 @@ public class DLCDownloader : MonoBehaviour
                 else
                 {
                     ui.UpdateDLC(bkgID, true);
+                    bkg3Purchased = true;
                 }
                 break;
             default:

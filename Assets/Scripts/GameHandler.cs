@@ -1,11 +1,16 @@
+using Firebase.Extensions;
+using Firebase.Storage;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameHandler : MonoBehaviour
 {
     public UIManager ui;
     public DataHandler dh;
+    public DLCDownloader dl;
+
     public bool bothConnected;
     public bool playerType;
     public int gameState;
@@ -25,6 +30,7 @@ public class GameHandler : MonoBehaviour
     {
         ui = FindObjectOfType<UIManager>();
         dh = FindObjectOfType<DataHandler>();
+        dl = FindObjectOfType<DLCDownloader>();
         gameState = 0;
         bothConnected = false;
     }
@@ -74,6 +80,92 @@ public class GameHandler : MonoBehaviour
         ui.statusText.text = "Pick your move!";
         totalmoves = 0;
         totalTimer = 0;
+
+        if(dl.bkg1Purchased == true)
+        {
+            int randMax = 1;
+            if (dl.bkg2Purchased == true)
+            {
+                randMax += 1;
+            }
+            if (dl.bkg3Purchased == true)
+            {
+                randMax += 1;
+            }
+            int rand = Random.Range(1, randMax);
+
+            FirebaseStorage storage = FirebaseStorage.DefaultInstance;
+            StorageReference bkg1Ref = storage.GetReferenceFromUrl("gs://connectedgamingassignment.appspot.com/Background/background1.jpg");
+            StorageReference bkg2Ref = storage.GetReferenceFromUrl("gs://connectedgamingassignment.appspot.com/Background/background2.jpg");
+            StorageReference bkg3Ref = storage.GetReferenceFromUrl("gs://connectedgamingassignment.appspot.com/Background/background3.png");
+            const long maxAllowedSize = 1 * 1024 * 1024;
+            switch (rand)
+            {
+                case 1:
+                    bkg1Ref.GetBytesAsync(maxAllowedSize).ContinueWithOnMainThread(task1 => {
+                        if (task1.IsFaulted || task1.IsCanceled)
+                        {
+                            Debug.LogException(task1.Exception);
+                            // Uh-oh, an error occurred!
+                        }
+                        else
+                        {
+                            //Turns the image into a byte stream so it can be processed
+                            byte[] fileContents = task1.Result;
+                            Debug.Log("Finished downloading!");
+
+                            //Converts the byte stream to a Texture2D component and displays it
+                            Texture2D texture = new Texture2D(1920, 1080);
+                            texture.LoadImage(fileContents);
+                            Sprite sprite = Sprite.Create(texture, new Rect(0f, 0f, 1920f, 1080f), new Vector2(0, 0), 100f);
+                            ui.gameMenu.GetComponent<Image>().sprite = sprite;
+                        }
+                    });
+                    break;
+                case 2:
+                    bkg2Ref.GetBytesAsync(maxAllowedSize).ContinueWithOnMainThread(task2 => {
+                        if (task2.IsFaulted || task2.IsCanceled)
+                        {
+                            Debug.LogException(task2.Exception);
+                            // Uh-oh, an error occurred!
+                        }
+                        else
+                        {
+                            //Turns the image into a byte stream so it can be processed
+                            byte[] fileContents = task2.Result;
+                            Debug.Log("Finished downloading!");
+
+                            //Converts the byte stream to a Texture2D component and displays it
+                            Texture2D texture = new Texture2D(1920, 1080);
+                            texture.LoadImage(fileContents);
+                            Sprite sprite = Sprite.Create(texture, new Rect(0f, 0f, 1920f, 1080f), new Vector2(0, 0), 100f);
+                            ui.gameMenu.GetComponent<Image>().sprite = sprite;
+                        }
+                    });
+                    break;
+                case 3:
+                    bkg3Ref.GetBytesAsync(maxAllowedSize).ContinueWithOnMainThread(task3 => {
+                        if (task3.IsFaulted || task3.IsCanceled)
+                        {
+                            Debug.LogException(task3.Exception);
+                            // Uh-oh, an error occurred!
+                        }
+                        else
+                        {
+                            //Turns the image into a byte stream so it can be processed
+                            byte[] fileContents = task3.Result;
+                            Debug.Log("Finished downloading!");
+
+                            //Converts the byte stream to a Texture2D component and displays it
+                            Texture2D texture = new Texture2D(1920, 1080);
+                            texture.LoadImage(fileContents);
+                            Sprite sprite = Sprite.Create(texture, new Rect(0f, 0f, 1920f, 1080f), new Vector2(0, 0), 100f);
+                            ui.gameMenu.GetComponent<Image>().sprite = sprite;
+                        }
+                    });
+                    break;
+            }
+        }
     }
 
     private void StartNewRound()
